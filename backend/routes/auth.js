@@ -1,5 +1,7 @@
 const crypto = require('crypto')
 const express = require('express')
+const path = require('path')
+const fs = require('fs')
 const db = require('../services/database')
 const { STATE_COOKIE, cookieOptions, createSession, destroySession, getUser, hash, parseCookies, publicUser, requireUser } = require('../services/auth')
 
@@ -84,7 +86,7 @@ router.get('/google/callback', async (req, res) => {
     `).run(String(profile.id), profile.email || '', profile.name || '', profile.picture || '', role)
     const user = db.prepare('SELECT * FROM users WHERE google_id = ?').get(String(profile.id))
     createSession(req, res, user.id)
-    res.redirect('/?valhalla=open')
+    res.redirect('/?profile=setup')
   } catch (error) {
     console.error('Google OAuth:', error)
     res.status(502).send('La connexion Google a échoué')
@@ -101,6 +103,47 @@ router.patch('/profile', requireUser, (req, res) => {
   if (playerName.length < 2 || playerName.length > 64) return res.status(400).json({ message: 'Le nom en jeu doit contenir entre 2 et 64 caractères' })
   db.prepare('UPDATE users SET player_name = ? WHERE id = ?').run(playerName, req.user.id)
   res.json({ user: publicUser(db.prepare('SELECT * FROM users WHERE id = ?').get(req.user.id)) })
+})
+
+router.post('/avatar', requireUser, async (req, res) => {
+  try {
+    const buffers = []
+    for await (const chunk of req) buffers.push(chunk)
+    const body = Buffer.concat(buffers)
+    const boundary = req.headers['content-type']?.split('boundary=')[1]
+    if (!boundary) return res.status(400).json({ message: 'En-tête multipart invalide' })
+
+    const parts = []
+    const raw = body.toString('latin1')
+    const delimiter = `--${boundary}`
+    const sections = raw.split(delimiter).filter((s) => s.trim() && !s.startsWith('--' + boundary + '--'))
+
+    for (const section of sections) {
+      const headerEnd = section.indexOf('\r\n\r\n')
+      if (headerEnd === -1) continue
+      const headerRaw = section.slice(0, headerEnd)
+      const contentRaw = section.slice(headerEnd + 4)
+      const nameMatch = headerRaw.match(/name="([^"]+)"/)
+      const filenameMatch = headerRaw.match(/filename="([^"]+)"/)
+      if (nameMatch && filenameMatch) {
+        const filename = `${Date.now()}-${filenameMatch[1].replace(/[^a-zA-Z0-9._-]/g, '_')}`
+        const ext = path.extname(filename).toLowerCase()
+        if (!['.png', '.jpg', '.jpeg', '.webp', '.gif'].includes(ext)) return res.status(400).json({ message: 'Format d’image non supporté' })
+        const uploadDir = path.join(__dirname, '..', 'uploads', 'avatars')
+        fs.mkdirSync(uploadDir, { recursive: true })
+        const filePath = path.join(uploadDir, filename)
+        const rawContent = contentRaw.replace(/\r\n$/, '')
+        fs.writeFileSync(filePath, Buffer.from(rawContent, 'latin1'))
+        const avatarUrl = `/uploads/avatars/${filename}`
+        db.prepare('UPDATE users SET avatar_url = ? WHERE id = ?').run(avatarUrl, req.user.id)
+        return res.json({ user: publicUser(db.prepare('SELECT * FROM users WHERE id = ?').get(req.user.id)) })
+      }
+    }
+    return res.status(400).json({ message: 'Aucun fichier trouvé dans la requête' })
+  } catch (err) {
+    console.error('Avatar upload:', err)
+    res.status(500).json({ message: 'L\'upload a échoué' })
+  }
 })
 
 router.post('/logout', (req, res) => {

@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
 import PropTypes from 'prop-types'
-import ValhallaAdmin from './ValhallaAdmin'
 import './ValhallaWheel.css'
 
 const WHEEL_COLORS = ['#e7a356', '#c68a38', '#d49545', '#b87a2e', '#a06a22', '#e7a356', '#c68a38', '#d49545', '#b87a2e', '#a06a22']
@@ -28,20 +27,17 @@ export default function ValhallaWheel({ onClose }) {
   const [wheelState, setWheelState] = useState({ authenticated: false, user: null, rewards: [], configured: false })
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
-  const [playerName, setPlayerName] = useState('')
-  const [savingProfile, setSavingProfile] = useState(false)
   const [rotation, setRotation] = useState(0)
   const [spinning, setSpinning] = useState(false)
   const [result, setResult] = useState(null)
   const [showResult, setShowResult] = useState(false)
-  const [showAdmin, setShowAdmin] = useState(false)
   const rotationRef = useRef(0)
+  const containerRef = useRef(null)
 
   const loadState = async () => {
     try {
       const data = await apiRequest('/api/valhalla/state')
       setWheelState(data)
-      setPlayerName(data.user?.playerName || '')
       setError('')
     } catch (requestError) {
       setError(requestError.message)
@@ -66,20 +62,6 @@ export default function ValhallaWheel({ onClose }) {
       window.removeEventListener('keydown', closeOnEscape)
     }
   }, [onClose])
-
-  const savePlayerName = async (event) => {
-    event.preventDefault()
-    setSavingProfile(true)
-    setError('')
-    try {
-      const data = await apiRequest('/api/auth/profile', { method: 'PATCH', body: JSON.stringify({ playerName }) })
-      setWheelState((current) => ({ ...current, user: data.user }))
-    } catch (requestError) {
-      setError(requestError.message)
-    } finally {
-      setSavingProfile(false)
-    }
-  }
 
   const spin = async () => {
     if (spinning || !wheelState.user?.tickets || !wheelState.rewards.length) return
@@ -112,7 +94,7 @@ export default function ValhallaWheel({ onClose }) {
   const segments = rewards.length
   const cx = 200
   const cy = 200
-  const radius = 176
+  const radius = 185
   const segmentAngle = 360 / segments
   const slices = Array.from({ length: segments }, (_, index) => {
     const start = (index * segmentAngle - 90) * Math.PI / 180
@@ -135,60 +117,86 @@ export default function ValhallaWheel({ onClose }) {
         <button className="gift-overlay-close" type="button" onClick={onClose} aria-label="Fermer la roue">✕</button>
         <h2 className="wheel-title" id="valhalla-wheel-title">ᚱᛟᚢᛖ ᛞᚢ ᚢᚨᛚᚺᚨᛚᛚᚨ</h2>
 
-        <div className="wheel-container">
+        <div className="wheel-container" ref={containerRef}>
           <div className="wheel-pointer"><span className="wheel-pointer-glow" /></div>
           <div className="wheel-spinner" style={{ transform: `rotate(${rotation}deg)`, transition: spinning ? 'transform 8s cubic-bezier(0.08, 0.72, 0.08, 1)' : 'none' }}>
             <svg viewBox="0 0 400 400" className="wheel-svg" aria-label="Roue du Valhalla">
-              <defs><radialGradient id="wheel-glow-outer" cx="50%" cy="50%" r="50%"><stop offset="85%" stopColor="transparent" /><stop offset="100%" stopColor="rgba(231,163,86,0.12)" /></radialGradient></defs>
-              <circle cx={cx} cy={cy} r={radius + 6} fill="none" stroke="rgba(231,163,86,0.12)" />
-              <circle cx={cx} cy={cy} r={radius + 8} fill="none" stroke="rgba(231,163,86,0.06)" strokeWidth=".5" strokeDasharray="2,6" />
-              {Array.from({ length: 24 }, (_, index) => {
-                const angle = index * 15 * Math.PI / 180
-                return <text key={index} x={cx + (radius + 5) * Math.cos(angle)} y={cy + (radius + 5) * Math.sin(angle)} textAnchor="middle" dominantBaseline="central" fill="rgba(231,163,86,0.15)" fontSize="9">{RUNES[index % RUNES.length]}</text>
+              <defs>
+                <radialGradient id="wheel-glow-outer" cx="50%" cy="50%" r="50%"><stop offset="85%" stopColor="transparent" /><stop offset="100%" stopColor="rgba(231,163,86,0.12)" /></radialGradient>
+              </defs>
+              <circle cx={cx} cy={cy} r={radius + 24} fill="#0d0a08" opacity="0.55" />
+              <circle cx={cx} cy={cy} r={radius + 20} fill="none" stroke="rgba(231,163,86,0.12)" strokeWidth="1" />
+              <circle cx={cx} cy={cy} r={radius + 24} fill="none" stroke="rgba(231,163,86,0.06)" strokeWidth="0.5" strokeDasharray="2,6" />
+              <circle cx={cx} cy={cy} r={radius + 2} fill="none" stroke="#e7a356" strokeWidth="1.5" opacity="0.35" />
+              {Array.from({ length: 24 }).map((_, i) => {
+                const a = i * 15 * Math.PI / 180
+                return <text key={`or-${i}`} x={cx + (radius + 9) * Math.cos(a)} y={cy + (radius + 9) * Math.sin(a)} textAnchor="middle" dominantBaseline="central" fill="rgba(231,163,86,0.15)" fontSize="9" fontFamily="Norse, serif">{RUNES[i % RUNES.length]}</text>
               })}
-              <circle cx={cx} cy={cy} r={radius + 4} fill="none" stroke="#e7a356" strokeWidth="1.5" opacity=".35" />
-              {slices.map((path, index) => <path key={index} d={path} fill={WHEEL_COLORS[index % WHEEL_COLORS.length]} stroke="#ffcd76" strokeWidth="1.2" />)}
-              {rewards.map((reward, index) => {
-                const middle = (index + .5) * segmentAngle
-                const angle = (middle - 90) * Math.PI / 180
-                const x = cx + radius * .6 * Math.cos(angle)
-                const y = cy + radius * .6 * Math.sin(angle)
-                const fontSize = segments <= 5 ? 22 : segments <= 8 ? 16 : segments <= 12 ? 14 : 11
-                return <text key={reward.id} x={x} y={y} transform={`rotate(${middle - 90}, ${x}, ${y})`} textAnchor="middle" dominantBaseline="central" fill="#ffcd76" stroke="#101315" strokeWidth="3" paintOrder="stroke" fontSize={fontSize} fontWeight="bold">{reward.name.substring(0, 30)}</text>
+              <circle cx={cx} cy={cy} r={radius + 3} fill="url(#wheel-glow-inner)" pointerEvents="none" />
+              {slices.map((d, i) => <path key={i} d={d} fill={WHEEL_COLORS[i % WHEEL_COLORS.length]} stroke="#ffcd76" strokeWidth="1.2" opacity="1" />)}
+              {Array.from({ length: 24 }).map((_, i) => {
+                const a = i * 15 * Math.PI / 180
+                return <circle key={`dt-${i}`} cx={cx + (radius - 18) * Math.cos(a)} cy={cy + (radius - 18) * Math.sin(a)} r="1.2" fill="rgba(231,163,86,0.2)" />
               })}
-              <circle cx={cx} cy={cy} r="34" fill="#101315" stroke="#e7a356" strokeWidth="1.5" opacity=".9" />
-              <circle cx={cx} cy={cy} r="22" fill="none" stroke="rgba(231,163,86,0.3)" />
+              {rewards.map((reward, i) => {
+                const mid = (i + 0.5) * segmentAngle
+                const rad = (mid - 90) * Math.PI / 180
+                const tx = cx + (radius * 0.55 - 5) * Math.cos(rad), ty = cy + (radius * 0.55 - 5) * Math.sin(rad)
+                const label = reward.name.substring(0, 30)
+                const fs = segments <= 5 ? 20 : segments <= 8 ? 14 : segments <= 12 ? 12 : 10
+                return <g key={reward.id} transform={`rotate(${mid - 90}, ${tx}, ${ty})`}>
+                  <text x={tx} y={ty} textAnchor="middle" dominantBaseline="central" fill="#101315" stroke="#101315" strokeWidth="3.5" strokeLinejoin="round" fontSize={fs} fontFamily="Norse, serif" fontWeight="bold" opacity="0.55">{label}</text>
+                  <text x={tx} y={ty} textAnchor="middle" dominantBaseline="central" fill="#ffcd76" fontSize={fs} fontFamily="Norse, serif" fontWeight="bold">{label}</text>
+                </g>
+              })}
+              <circle cx={cx} cy={cy} r="34" fill="#101315" stroke="#e7a356" strokeWidth="1.5" opacity="0.6" />
+              <circle cx={cx} cy={cy} r="28" fill="none" stroke="rgba(231,163,86,0.2)" strokeWidth="0.5" strokeDasharray="3,3" />
+              <circle cx={cx} cy={cy} r="22" fill="none" stroke="rgba(231,163,86,0.3)" strokeWidth="1" />
+              {Array.from({ length: 8 }).map((_, i) => {
+                const a = i * 45 * Math.PI / 180
+                return <circle key={`hb-${i}`} cx={cx + 24 * Math.cos(a)} cy={cy + 24 * Math.sin(a)} r="1.5" fill="rgba(255,205,118,0.3)" />
+              })}
               <circle cx={cx} cy={cy} r="14" fill="rgba(231,163,86,0.08)" />
-              <text x={cx} y={cy + 1} textAnchor="middle" dominantBaseline="central" fill="#ffcd76" fontSize="22" fontWeight="bold">ᚠ</text>
-              <circle cx={cx} cy={cy} r={radius + 4} fill="url(#wheel-glow-outer)" pointerEvents="none" />
+              <text x={cx} y={cy + 1} textAnchor="middle" dominantBaseline="central" fill="#ffcd76" fontSize="22" fontFamily="Norse, serif" fontWeight="bold">ᚠ</text>
+              <circle cx={cx} cy={cy} r={radius + 24} fill="url(#wheel-glow-outer)" pointerEvents="none" />
             </svg>
           </div>
-          <svg viewBox="0 0 400 400" className="wheel-svg wheel-outer-runes" style={{ transform: `rotate(${rotation}deg)`, transition: spinning ? 'transform 8s cubic-bezier(0.08, 0.72, 0.08, 1)' : 'none' }} aria-hidden="true">
-            {Array.from({ length: segments }, (_, index) => {
-              const middle = (index + .5) * segmentAngle
-              const angle = (middle - 90) * Math.PI / 180
-              const x = cx + (radius + 14) * Math.cos(angle)
-              const y = cy + (radius + 14) * Math.sin(angle)
-              return <text key={index} x={x} y={y} transform={`rotate(${middle - 90}, ${x}, ${y})`} textAnchor="middle" dominantBaseline="central" fill="#ffeecc" fontSize="20" fontWeight="bold">{RUNES[index % RUNES.length]}</text>
+          <svg viewBox="0 0 400 400" className="wheel-svg" style={{ position: 'absolute', inset: 0, transform: `rotate(${rotation}deg)`, transition: spinning ? 'transform 8s cubic-bezier(0.08, 0.72, 0.08, 1)' : 'none', pointerEvents: 'none' }} aria-hidden="true">
+            <defs>
+              <filter id="rune-glow">
+                <feGaussianBlur in="SourceAlpha" stdDeviation="2" result="blur" />
+                <feOffset dx="0" dy="0" />
+                <feFlood floodColor="#ffcd76" floodOpacity="0.3" />
+                <feComposite in2="blur" operator="in" result="glowColored" />
+                <feMerge>
+                  <feMergeNode in="glowColored" />
+                  <feMergeNode in="SourceGraphic" />
+                </feMerge>
+              </filter>
+            </defs>
+            {Array.from({ length: segments }).map((_, i) => {
+              const mid = (i + 0.5) * segmentAngle
+              const rad = (mid - 90) * Math.PI / 180
+              const rx = cx + (radius + 9) * Math.cos(rad)
+              const ry = cy + (radius + 9) * Math.sin(rad)
+              return <g key={`outer-rune-${i}`} transform={`rotate(${mid - 90}, ${rx}, ${ry})`}>
+                <text x={rx} y={ry} textAnchor="middle" dominantBaseline="central" fill="#ffeecc" fontSize="20" fontFamily="Norse, serif" fontWeight="bold" opacity="0.9" filter="url(#rune-glow)">
+                  {RUNES[i % RUNES.length]}
+                </text>
+              </g>
             })}
           </svg>
         </div>
 
-        <p className="wheel-subtitle">Que le Père-de-Tout guide ta création : chaque ticket déverrouille un fragment de ses trésors oubliés.</p>
+        <p className="wheel-subtitle">Que le Père-de-Tout guide ton aventure : chaque ticket déverrouille un fragment de ses trésors oubliés.</p>
         {loading && <p className="wheel-status">Invocation de la roue...</p>}
-        {!loading && !wheelState.authenticated && <p className="wheel-login-required">Connecte-toi depuis le header pour accéder à tes tickets et lancer la roue.</p>}
-        {wheelState.authenticated && !wheelState.user.playerName && (
-          <form className="wheel-profile" onSubmit={savePlayerName}>
-            <label htmlFor="valhalla-player">Nom exact du personnage Valheim</label>
-            <div><input id="valhalla-player" value={playerName} onChange={(event) => setPlayerName(event.target.value)} maxLength="64" required /><button type="submit" disabled={savingProfile}>Valider</button></div>
-          </form>
-        )}
+        {!loading && !wheelState.authenticated && <p className="wheel-login-required">Connecte-toi pour accéder à tes tickets et lancer la roue.</p>}
+        {!loading && wheelState.authenticated && !wheelState.user.playerName && <p className="wheel-login-required">Configure ton pseudo dans ton profil pour lancer la roue.</p>}
         {wheelState.authenticated && wheelState.user.playerName && (
           <>
             <div className="wheel-account">
               <img src={wheelState.user.avatarUrl} alt="" referrerPolicy="no-referrer" />
               <span><strong>{wheelState.user.playerName}</strong><small>{wheelState.user.tickets} ticket{wheelState.user.tickets > 1 ? 's' : ''} vers le Valhalla</small></span>
-              {wheelState.user.role === 'admin' && <button type="button" onClick={() => setShowAdmin(true)}>Administration</button>}
             </div>
             <button className="wheel-btn" type="button" disabled={spinning || !wheelState.configured || !wheelState.rewards.length || wheelState.user.tickets < 1} onClick={spin}>
               {spinning ? 'ᚱᚢᛚᛖ ᛏᚢᚱᚾᛖ...' : wheelState.user.tickets < 1 ? 'ᚲ Aucun ticket' : !wheelState.configured ? 'Livraison non configurée' : !wheelState.rewards.length ? 'Aucune récompense' : '⚔ Lancer la Roue du Valhalla ⚔'}
@@ -199,7 +207,6 @@ export default function ValhallaWheel({ onClose }) {
       </div>
 
       {showResult && result && <div className="reward-overlay"><div className="reward-overlay-content"><div className="reward-runes">ᚱ ᛖ ᚲ ᛟ ᛗ ᛈ ᛖ ᚾ ᛋ ᛖ</div><div className="reward-name">{result.name}</div><div className="reward-skjoldheim"><span>ᛉ</span><span>Récompense livrée par Odin,<br />à récupérer à Skjoldheim.</span></div></div></div>}
-      {showAdmin && <ValhallaAdmin onClose={() => { setShowAdmin(false); loadState() }} apiRequest={apiRequest} />}
     </div>
   )
 }

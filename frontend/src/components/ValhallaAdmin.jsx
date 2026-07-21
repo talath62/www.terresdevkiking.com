@@ -69,8 +69,8 @@ export default function ValhallaAdmin({ onClose, apiRequest }) {
             <form className="valhalla-reward-form" onSubmit={submitReward}>
               <input placeholder="Nom affiché" value={form.name} onChange={(event) => setForm({ ...form, name: event.target.value })} required />
               <input placeholder="Prefab Valheim" value={form.prefabName} onChange={(event) => setForm({ ...form, prefabName: event.target.value })} required />
-              <label>Quantité<input type="number" min="1" value={form.quantity} onChange={(event) => setForm({ ...form, quantity: Number(event.target.value) })} required /></label>
-              <label>Chance (%)<input type="number" min="0.01" max="100" step="0.01" value={form.chance} onChange={(event) => setForm({ ...form, chance: Number(event.target.value) })} required /></label>
+              <label>Quantité<input type="number" min="1" max="9999" value={form.quantity} onChange={(event) => setForm({ ...form, quantity: Number(event.target.value) })} required /></label>
+              <label>Chance (%)<input type="number" min="0.1" max="100" step="0.1" value={form.chance} onChange={(event) => setForm({ ...form, chance: Number(event.target.value) })} required /></label>
               <label className="valhalla-check"><input type="checkbox" checked={form.active} onChange={(event) => setForm({ ...form, active: event.target.checked })} /> Actif</label>
               <button type="submit">{editingId ? 'Enregistrer' : 'Créer le lot'}</button>
               {editingId && <button type="button" className="secondary" onClick={() => { setEditingId(null); setForm(EMPTY_REWARD) }}>Annuler</button>}

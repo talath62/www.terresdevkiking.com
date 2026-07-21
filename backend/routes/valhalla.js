@@ -151,7 +151,15 @@ router.delete('/admin/rewards/:id', requireAdmin, (req, res) => {
 })
 
 router.get('/admin/users', requireAdmin, (req, res) => {
-  res.json({ users: db.prepare('SELECT id, email, name, player_name, role, tickets, created_at FROM users ORDER BY created_at DESC').all() })
+  res.json({ users: db.prepare(`
+    SELECT users.id, users.email, users.name, users.avatar_url, users.player_name, users.role,
+           users.tickets, users.created_at, users.last_seen_at,
+           COUNT(spins.id) AS spin_count,
+           COALESCE(SUM(CASE WHEN spins.status = 'delivered' THEN 1 ELSE 0 END), 0) AS delivered_count
+    FROM users LEFT JOIN spins ON spins.user_id = users.id
+    GROUP BY users.id
+    ORDER BY users.created_at DESC
+  `).all() })
 })
 
 router.post('/admin/users/:id/tickets', requireAdmin, (req, res) => {
@@ -182,7 +190,7 @@ function validateReward(body) {
   if (!name || name.length > 255) return { error: 'Nom de lot invalide' }
   if (!prefabName || prefabName.length > 255) return { error: 'Prefab invalide' }
   if (!Number.isInteger(quantity) || quantity < 1 || quantity > 10000) return { error: 'Quantité invalide' }
-  if (!Number.isFinite(chance) || chance <= 0 || chance > 100) return { error: 'Chance invalide' }
+  if (!Number.isFinite(chance) || chance < 0.1 || chance > 100) return { error: 'La chance doit être comprise entre 0,1 et 100 %' }
   return { name, prefabName, quantity, chance, active }
 }
 

@@ -8,6 +8,7 @@
 .valhalla-admin p { color: #999; }
 .valhalla-admin-grid { display: grid; grid-template-columns: minmax(280px, .7fr) minmax(420px, 1.3fr); gap: 16px; }
 .valhalla-admin-panel { margin-bottom: 16px; padding: 20px; border: 1px solid rgba(255,255,255,.08); background: rgba(255,255,255,.025); }
+.valhalla-panel-note { margin: -8px 0 14px; color: #777 !important; font-size: .7rem; line-height: 1.5; }
 .valhalla-reward-form { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 .valhalla-reward-form > input { grid-column: 1 / -1; }
 .valhalla-reward-form input { width: 100%; min-height: 40px; padding: 8px 10px; border: 1px solid rgba(255,255,255,.12); background: #080a09; color: #eee; }
@@ -18,16 +19,31 @@
 .valhalla-reward-form button { grid-column: 1 / -1; }
 .valhalla-reward-form button.secondary { border-color: rgba(255,255,255,.12); background: transparent; color: #aaa; }
 .valhalla-list { display: grid; gap: 7px; max-height: 370px; overflow: auto; }
-.valhalla-list article { display: grid; grid-template-columns: 1fr auto auto; align-items: center; gap: 7px; padding: 10px; border: 1px solid rgba(255,255,255,.07); }
+.valhalla-list article { display: grid; grid-template-columns: 28px 1fr auto auto; align-items: center; gap: 7px; padding: 10px; border: 1px solid rgba(255,255,255,.07); }
 .valhalla-list article.disabled { opacity: .45; }
 .valhalla-list article div, .valhalla-admin td { min-width: 0; }
 .valhalla-list strong, .valhalla-list small, .valhalla-admin td small { display: block; }
 .valhalla-list small, .valhalla-admin td small { margin-top: 3px; color: #777; font-size: .68rem; }
 .valhalla-list button.danger { border-color: rgba(210,80,70,.25); background: rgba(210,80,70,.08); color: #df8b82; }
+.valhalla-reward-index { display: grid; width: 24px; height: 24px; place-items: center; border: 1px solid rgba(216,181,106,.2); border-radius: 50%; color: var(--primary); font-size: .65rem; }
+.valhalla-reward-total { margin-bottom: 13px; color: #999; font-size: .7rem; }
+.valhalla-reward-total > span { display: block; margin-bottom: 6px; }.valhalla-reward-total strong { color: var(--primary-light); }
+.valhalla-reward-total i { display: block; height: 5px; overflow: hidden; border-radius: 10px; background: rgba(255,255,255,.06); }
+.valhalla-reward-total b { display: block; height: 100%; background: linear-gradient(90deg, #9a7136, #d8b56a); transition: width .3s; }
+.valhalla-reward-total.is-complete b { background: linear-gradient(90deg, #598b61, #8fca99); }
+.valhalla-user-list { display: grid; gap: 8px; }
+.valhalla-user-card { display: grid; grid-template-columns: 42px minmax(220px, 1fr) 65px auto; align-items: center; gap: 12px; padding: 12px; border: 1px solid rgba(255,255,255,.07); background: rgba(0,0,0,.12); }
+.valhalla-user-card > img, .valhalla-user-avatar { width: 42px; height: 42px; border-radius: 50%; object-fit: cover; }
+.valhalla-user-avatar { display: grid; place-items: center; border: 1px solid rgba(216,181,106,.2); color: var(--primary); }
+.valhalla-user-identity { min-width: 0; }.valhalla-user-identity > strong, .valhalla-user-identity > span, .valhalla-user-identity > small { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.valhalla-user-identity > strong { color: #e8e2d6; font-size: .8rem; }.valhalla-user-identity > span { margin-top: 3px; color: #999; font-size: .68rem; }.valhalla-user-identity > small { margin-top: 4px; color: #666; font-size: .6rem; }
+.valhalla-user-identity em { margin-left: 6px; padding: 2px 5px; border: 1px solid rgba(216,181,106,.25); color: var(--primary); font-size: .55rem; font-style: normal; font-weight: 700; text-transform: uppercase; }
+.valhalla-user-tickets { text-align: center; }.valhalla-user-tickets strong, .valhalla-user-tickets span { display: block; }.valhalla-user-tickets strong { color: var(--primary-light); font-family: 'Cinzel', serif; font-size: 1.4rem; }.valhalla-user-tickets span { color: #777; font-size: .58rem; }
+.valhalla-user-actions { display: flex; gap: 6px; }.valhalla-user-actions button { min-height: 34px; padding: 0 10px; border: 1px solid rgba(216,181,106,.35); background: rgba(216,181,106,.1); color: var(--primary-light); cursor: pointer; font-size: .65rem; }.valhalla-user-actions button.secondary { border-color: rgba(255,255,255,.1); background: transparent; color: #888; }.valhalla-user-actions button:disabled { opacity: .35; cursor: not-allowed; }
 .valhalla-table-wrap { overflow-x: auto; }
 .valhalla-admin table { width: 100%; border-collapse: collapse; font-size: .78rem; }
 .valhalla-admin th, .valhalla-admin td { padding: 10px; border-bottom: 1px solid rgba(255,255,255,.07); text-align: left; }
 .valhalla-admin th { color: #777; font-size: .62rem; letter-spacing: .1em; text-transform: uppercase; }
 .valhalla-admin td button { min-height: 28px; margin-right: 5px; }
 .status-delivered { color: #7fc58c; }.status-failed { color: #df8b82; }.status-pending { color: #d8b56a; }
-@media (max-width: 760px) { .valhalla-admin-backdrop { padding: 8px; } .valhalla-admin { width: 100%; padding: 32px 12px 16px; } .valhalla-admin-grid { grid-template-columns: 1fr; } .valhalla-list article { grid-template-columns: 1fr auto; } .valhalla-list article div { grid-column: 1 / -1; } }
+@media (max-width: 760px) { .valhalla-admin-backdrop { padding: 8px; } .valhalla-admin { width: 100%; padding: 32px 12px 16px; } .valhalla-admin-grid { grid-template-columns: 1fr; } .valhalla-list article { grid-template-columns: 28px 1fr; } .valhalla-list article button { grid-row: 2; } .valhalla-user-card { grid-template-columns: 42px 1fr 55px; } .valhalla-user-actions { grid-column: 1 / -1; }.valhalla-user-actions button { flex: 1; } }

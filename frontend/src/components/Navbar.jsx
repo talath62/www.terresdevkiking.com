@@ -12,7 +12,7 @@ const links = [
   ['/videos', 'Vidéos'],
 ]
 
-export default function Navbar({ onOpenGifts }) {
+export default function Navbar({ onOpenGifts, onOpenProfile }) {
   const [open, setOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
   const [authUser, setAuthUser] = useState(null)
@@ -30,11 +30,6 @@ export default function Navbar({ onOpenGifts }) {
       .then((data) => setAuthUser(data.authenticated ? data.user : null))
       .catch(() => setAuthUser(null))
   }, [])
-
-  const logout = async () => {
-    await fetch('/api/auth/logout', { method: 'POST' }).catch(() => {})
-    setAuthUser(null)
-  }
 
   return (
     <header className={`navbar ${scrolled ? 'is-scrolled' : ''}`}>
@@ -58,7 +53,7 @@ export default function Navbar({ onOpenGifts }) {
             <Link to="/nous-rejoindre" className="nav-cta" onClick={() => setOpen(false)}>Nous rejoindre <span>↗</span></Link>
             <button className="nav-gifts" type="button" onClick={() => { setOpen(false); onOpenGifts() }}>🎁 Cadeaux</button>
             {authUser ? (
-              <button className="nav-auth is-connected" type="button" onClick={logout} title="Se déconnecter">
+              <button className="nav-auth is-connected" type="button" onClick={() => { setOpen(false); onOpenProfile() }} title="Ouvrir mon profil">
                 {authUser.avatarUrl && <img src={authUser.avatarUrl} alt="" referrerPolicy="no-referrer" />}
                 <span>{authUser.playerName || authUser.name}</span>
               </button>
@@ -72,4 +67,5 @@ export default function Navbar({ onOpenGifts }) {
 
 Navbar.propTypes = {
   onOpenGifts: PropTypes.func.isRequired,
+  onOpenProfile: PropTypes.func.isRequired,
 }

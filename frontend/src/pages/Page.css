@@ -107,3 +107,12 @@
   .gallery-page .screenshot-button:nth-child(1),
   .gallery-page .screenshot-button:nth-child(6) { grid-column: span 2; grid-row: span 2; }
 }
+
+.admin-valhalla-page { padding-top: 106px; padding-bottom: 60px; }
+.admin-valhalla-page .valhalla-admin-page { max-width: 1180px; margin: 0 auto; padding: 0 20px; }
+.admin-valhalla-page .valhalla-admin-page header { margin-bottom: 28px; }
+.admin-valhalla-page .valhalla-admin-page header span { display: block; margin-bottom: 8px; }
+.admin-valhalla-page .valhalla-admin-page h2 { margin: 7px 0 4px; font-size: clamp(1.5rem, 4vw, 2.4rem); }
+.admin-valhalla-page .valhalla-admin-page p { color: #999; }
+.admin-valhalla-back { color: var(--primary); font-size: .72rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+.admin-valhalla-back:hover { color: var(--primary-light); }
