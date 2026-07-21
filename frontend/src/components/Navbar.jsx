@@ -1,5 +1,6 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link, NavLink } from 'react-router-dom'
+import PropTypes from 'prop-types'
 import './Navbar.css'
 
 const links = [
@@ -8,13 +9,35 @@ const links = [
   ['/captures-decran', 'Galerie'],
   ['/fonctionnalites-valheim-viking', 'Le monde'],
   ['/evenements-valheim-viking', 'Évènements'],
+  ['/videos', 'Vidéos'],
 ]
 
-export default function Navbar() {
+export default function Navbar({ onOpenGifts }) {
   const [open, setOpen] = useState(false)
+  const [scrolled, setScrolled] = useState(false)
+  const [authUser, setAuthUser] = useState(null)
+
+  useEffect(() => {
+    const update = () => setScrolled(window.scrollY > 35)
+    update()
+    window.addEventListener('scroll', update, { passive: true })
+    return () => window.removeEventListener('scroll', update)
+  }, [])
+
+  useEffect(() => {
+    fetch('/api/auth/me')
+      .then((response) => response.json())
+      .then((data) => setAuthUser(data.authenticated ? data.user : null))
+      .catch(() => setAuthUser(null))
+  }, [])
+
+  const logout = async () => {
+    await fetch('/api/auth/logout', { method: 'POST' }).catch(() => {})
+    setAuthUser(null)
+  }
 
   return (
-    <header className="navbar">
+    <header className={`navbar ${scrolled ? 'is-scrolled' : ''}`}>
       <div className="container nav-container">
         <Link to="/" className="nav-logo" aria-label="Terres de Viking - Accueil">
           <span className="logo-mark"><img src="/terres-de-viking-logo.webp" alt="" /></span>
@@ -31,9 +54,22 @@ export default function Navbar() {
               <li key={to}><NavLink to={to} onClick={() => setOpen(false)} className={({ isActive }) => isActive ? 'active' : ''}>{label}</NavLink></li>
             ))}
           </ul>
-          <Link to="/nous-rejoindre" className="nav-cta" onClick={() => setOpen(false)}>Nous rejoindre <span>↗</span></Link>
+          <div className="nav-actions">
+            <Link to="/nous-rejoindre" className="nav-cta" onClick={() => setOpen(false)}>Nous rejoindre <span>↗</span></Link>
+            <button className="nav-gifts" type="button" onClick={() => { setOpen(false); onOpenGifts() }}>🎁 Cadeaux</button>
+            {authUser ? (
+              <button className="nav-auth is-connected" type="button" onClick={logout} title="Se déconnecter">
+                {authUser.avatarUrl && <img src={authUser.avatarUrl} alt="" referrerPolicy="no-referrer" />}
+                <span>{authUser.playerName || authUser.name}</span>
+              </button>
+            ) : <a className="nav-auth" href="/api/auth/google" onClick={() => setOpen(false)}>Connexion</a>}
+          </div>
         </nav>
       </div>
     </header>
   )
+}
+
+Navbar.propTypes = {
+  onOpenGifts: PropTypes.func.isRequired,
 }

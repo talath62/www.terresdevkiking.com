@@ -25,6 +25,12 @@
 
 html { scroll-behavior: smooth; }
 
+html { scrollbar-color: var(--primary-dark) #080b0b; scrollbar-width: thin; }
+::selection { background: rgba(216,181,106,.82); color: #080b0b; }
+::-webkit-scrollbar { width: 9px; }
+::-webkit-scrollbar-track { background: #080b0b; }
+::-webkit-scrollbar-thumb { border: 2px solid #080b0b; border-radius: 10px; background: var(--primary-dark); }
+
 body {
   min-width: 320px;
   background:
@@ -61,6 +67,7 @@ h1, h2, h3, h4, h5 {
 a { color: var(--primary); text-decoration: none; }
 img { max-width: 100%; }
 button, a { -webkit-tap-highlight-color: transparent; }
+button:focus-visible, a:focus-visible { outline: 2px solid var(--primary-light); outline-offset: 4px; }
 
 .container {
   width: min(100% - 40px, 1240px);
@@ -139,6 +146,14 @@ button, a { -webkit-tap-highlight-color: transparent; }
 
 .page-shell { min-height: 70vh; padding-top: 76px; }
 .page-shell::before { position: absolute; inset: 76px 0 auto; height: 280px; background: linear-gradient(180deg, rgba(216,181,106,.08), transparent); content: ''; pointer-events: none; }
+
+.reveal-item {
+  opacity: 0;
+  transform: translate3d(0, 26px, 0);
+  transition: opacity .75s var(--reveal-delay) ease, transform .75s var(--reveal-delay) cubic-bezier(.2,.7,.2,1);
+}
+
+.reveal-item.is-revealed { opacity: 1; transform: translate3d(0, 0, 0); }
 
 @media (max-width: 900px) {
   .grid-3 { grid-template-columns: repeat(2, minmax(0, 1fr)); }

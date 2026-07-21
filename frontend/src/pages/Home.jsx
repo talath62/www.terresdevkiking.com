@@ -9,7 +9,7 @@ const features = [
   { rune: 'ᛗ', number: '01', title: 'Un monde étendu', desc: 'Une carte plus vaste, ponctuée de régions secrètes et de terres encore vierges.' },
   { rune: 'ᛏ', number: '02', title: 'Quêtes inédites', desc: 'Des récits scénarisés, des PNJ vivants et des choix qui façonnent votre aventure.' },
   { rune: 'ᛉ', number: '03', title: 'Combats renouvelés', desc: 'Boss, créatures, armes et armures exclusifs pour repousser vos limites.' },
-  { rune: 'ᛟ', number: '04', title: 'Une vraie communauté', desc: 'Guildes, métiers et évènements réguliers au cœur d’un monde persistant.' },
+  { rune: 'ᛟ', number: '04', title: 'Une vraie communauté', desc: 'Guildes, entraide et évènements réguliers au cœur d’un monde persistant.' },
 ]
 
 const gallery = [

@@ -1,12 +1,9 @@
 [Unit]
 Description=Terres de Viking website API
 After=network-online.target
-Wants=network-online.target
 
 [Service]
 Type=simple
-User=valheim
-Group=valheim
 WorkingDirectory=/var/www/terresdeviking.com/backend
 Environment=NODE_ENV=production
 Environment=PORT=3002
@@ -14,8 +11,8 @@ Environment=STEAM_QUERY_HOST=server.terresdeviking.com
 Environment=STEAM_QUERY_PORT=2467
 EnvironmentFile=-/var/www/terresdeviking.com/backend/.env
 ExecStart=/usr/bin/node /var/www/terresdeviking.com/backend/server.js
-Restart=on-failure
+Restart=always
 RestartSec=3
 
 [Install]
-WantedBy=multi-user.target
+WantedBy=default.target

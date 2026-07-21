@@ -33,11 +33,6 @@ const features = [
     desc: 'Notre équipe organise des évènements réguliers : chasses au trésor, tournois, constructions collectives et défis en tout genre.',
   },
   {
-    icon: '🏗️',
-    title: 'Système de métiers',
-    desc: 'Un système de métiers exclusif vous permet de vous spécialiser et de contribuer à l\'économie du serveur. Forgeron, bûcheron, mineur... À vous de choisir !',
-  },
-  {
     icon: '🤝',
     title: 'Guildes',
     desc: 'Rejoignez ou créez votre guilde. Les Enfants d\'Odin, Les Ombres Anciennes... Chaque guilde a sa propre histoire et ses objectifs.',

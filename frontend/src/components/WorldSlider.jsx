@@ -2,12 +2,12 @@ import { useEffect, useRef, useState } from 'react'
 import './WorldSlider.css'
 
 const slides = [
-  { image: '/sliders/royaume-des-prairies.webp', title: 'Le Royaume des Prairies', region: 'Terres centrales', text: 'Les premières terres d’une aventure qui ne ressemble à aucune autre.' },
-  { image: '/sliders/sanctuaire-ancien.webp', title: 'Le Sanctuaire Ancien', region: 'Rivages mystiques', text: 'Des vestiges animés par une magie que même les anciens redoutaient.' },
-  { image: '/sliders/forteresse-du-nord.webp', title: 'La Forteresse du Nord', region: 'Montagnes gelées', text: 'Une citadelle dressée contre la nuit et les tempêtes éternelles.' },
-  { image: '/sliders/autel-des-anciens.webp', title: 'L’Autel des Anciens', region: 'Bois interdits', text: 'Chaque pierre porte la mémoire des héros venus avant vous.' },
-  { image: '/sliders/port-viking.webp', title: 'Le Port de Fjornheim', region: 'Côtes de l’Ouest', text: 'Point de départ des grandes expéditions au-delà des mers connues.' },
-  { image: '/sliders/ruines-sous-la-lune.webp', title: 'Les Ruines sous la Lune', region: 'Forêt noire', text: 'La nuit révèle parfois ce que le jour préfère garder secret.' },
+  { image: '/sliders/experience-inoubliable.webp', title: 'Une expérience inoubliable', region: 'Monde enchanté', text: 'Traversez des paysages impossibles et découvrez une aventure qui repousse les frontières de Valheim.' },
+  { image: '/sliders/sanctuaire-ancien.webp', title: 'Des constructions mythiques', region: 'Rivages mystiques', text: 'Des vestiges animés par une magie que même les anciens redoutaient.' },
+  { image: '/sliders/forteresse-du-nord.webp', title: 'L’expérience Valheim ultime', region: 'Montagnes gelées', text: 'Une citadelle dressée contre la nuit et les tempêtes éternelles.' },
+  { image: '/sliders/autel-des-anciens.webp', title: 'Des quêtes scénarisées', region: 'Bois interdits', text: 'Chaque pierre porte la mémoire des héros venus avant vous.' },
+  { image: '/sliders/grand-nord.webp', title: 'Le Grand Nord t’appelle', region: 'Terres du Nord', text: 'Franchissez les portes de la forteresse et affrontez les mystères des terres septentrionales.' },
+  { image: '/sliders/ruines-sous-la-lune.webp', title: 'Un univers immersif', region: 'Forêt noire', text: 'La nuit révèle parfois ce que le jour préfère garder secret.' },
 ]
 
 export default function WorldSlider() {
