@@ -33,6 +33,11 @@ const features = [
     desc: 'Notre équipe organise des évènements réguliers : chasses au trésor, tournois, constructions collectives et défis en tout genre.',
   },
   {
+    icon: '🌾',
+    title: 'Système de saison',
+    desc: 'Le monde évolue au fil des saisons, chacune apportant son lot de changements, de ressources uniques et d\'évènements saisonniers. L\'hiver rend les voyages plus périlleux, le printemps réveille la nature, l\'été offre des récoltes abondantes et l\'automne prépare le monde pour les mois froids.',
+  },
+  {
     icon: '🤝',
     title: 'Guildes',
     desc: 'Rejoignez ou créez votre guilde. Les Enfants d\'Odin, Les Ombres Anciennes... Chaque guilde a sa propre histoire et ses objectifs.',

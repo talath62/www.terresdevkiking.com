@@ -16,6 +16,20 @@ const videos = [
     label: 'La saga continue',
     description: 'Découvrez les terres, les défis et les mystères qui vous attendent dans la quatrième saison de notre aventure.',
   },
+  {
+    id: '46NsdQyNWdY',
+    image: '/video-thumbnails/valhalla-waiting.webp',
+    title: 'L\'Attente du Valhalla',
+    label: 'L\'esprit viking',
+    description: 'Une immersion dans l\'attente du Valhalla, entre mythes nordiques et ambiance épique propre à Terres de Viking.',
+  },
+  {
+    id: '3TrSmm8e174',
+    image: '/video-thumbnails/aurore-boreale.webp',
+    title: 'Odin veille sur les Terres',
+    label: 'L\' Odin veille',
+    description: 'Laissez-vous porter par la beauté des aurores boréales qui illuminent le ciel des Terres de Viking.',
+  },
 ]
 
 export default function Videos() {
