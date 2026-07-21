@@ -1,0 +1,69 @@
+Progressez avant de construire dans une nouvelle zone.
+Évitez les zones déjà instanciées pour bâtir sereinement (F2)
+Construisez loin des autres pour préserver l’espace de chacun.
+Vérifiez les instances autour de vous avant de vous installer avec F2.
+Le meilleur emplacement se mérite : explorez davantage.
+Les structures officielles sont protégées : respectez-les.
+Aucune construction sur les points d’apparition ou îles spéciales.
+Forteresses ashlands, ports et ponts sont des zones interdites à la construction.
+Respectez les créations mises à votre disposition.
+Un problème ? Signalez-le via un ticket.
+Tout vol d'objets ou comportement inaproprié entraine un bannissement définitif du serveur.
+Voyagez à pied, en bateau ou via les portails publics.
+Suivez les chemins pour explorer efficacement. Préparez-vous avant chaque long voyage.
+Les portails facilitent vos déplacements mais ils sont limités à 10 par joueurs.
+Acheter une pierre de tonnerre à Haldor est une bonne idée.
+Vous obtenez 2 portails supplémentaires à chaque boss de Eikthyr à Yagluth pour un total de 10.
+L’exploration est au cœur de votre aventure. Pour commencer la quête principale, parler à Asgrim à Skjoldheim
+Les ressources et les donjons se réinitialisent automatiquement.
+Les arbres repoussent si leur souche reste intacte.
+Le monde évolue même sans vous. Jouez ensemble pour en tirer le meilleur.
+Les pierres de pouvoir sont cachées à travers le monde. C'est à vous de les trouver.
+Il est interdit de modifier les zones de boss.
+Présentez les trophées au cercle des anciens pour partir en quête des autels de pouvoir de Boss.
+Explorez pour découvrir les emplacements des boss.
+Des événements sont organisés régulièrement par le staff.
+Restez informé via nos chaînes officielles.
+Participez pour gagner récompenses et richesses.
+Suivez les événements en direct sur la chaine Twitch - Terres de Viking
+La communauté vit à travers ses événements.
+Respect et bienveillance sont essentiels entre joueurs.
+Ne modifiez pas les constructions d'autres joueurs sans autorisation.
+Les avant-postes sont interdits dans certaines zones.
+Nettoyez les bases que vous n’utilisez plus.
+Utilisez Discord pour communiquer et vous organiser.
+Restez informé des annonces importantes.
+Besoin d’aide ? Ouvrez un ticket.
+Discord est le cœur des échanges entre Vikings. La communauté se construit ensemble.
+Créez un groupe avec /invite [nom]. Quittez un groupe avec /leave.
+Parlez à votre groupe avec /p. Les quêtes PVE sont partagées en groupe.
+Réorganise ton interface avec F7 comme un vrai maître du HUD.
+Forge ton alliance avec O pour les guildes.
+Fais le tri comme un Viking discipliné avec SUPPR. Garde les lieux propres pour les suivants !
+Exprime-toi comme un vrai Viking avec T (emotes).
+Ajuste parfaitement tes constructions avec V (axes Gizmo).
+Ajuste parfaitement tes constructions avec +/- de ton pavé numérique (axes Gizmo).
+Maintiens l’ordre avec /remove [nom].”
+Désigne un chef digne avec /promote [nom].
+Parle à ton clan discrètement avec /p [texte].
+Passe en mode discussion de groupe avec /p.
+Surveille tes compagnons grâce aux PV affichés à gauche.
+Profite du renouveau : les cultures explosent au printemps.
+Développe ton élevage pendant que la nature est généreuse.
+Récolte sans limite : l’été est la saison de l’abondance.
+Amasse richesses et ressources pour étendre ton territoire.
+Profite du pic de production pour préparer la saison hivernale.
+Stocke dès maintenant : l’hiver approche.
+Survis à l’hiver : les conditions deviennent extrêmes, les ressources se raréfient, chaque décision compte.
+Seuls les Vikings préparés résistent au froid. Un vrai Viking affronte la tempête… avec une torche en main.
+Un vote pour le serveur peut t’offrir une récompense en jeu.
+Chaque quête te rapporte 1 point de réputation au leaderboard.
+Accomplis des quêtes et impose ton nom au classement.
+Consulte le classement des Terres de Viking avec la touche L
+La réputation du classement correspond aux points gagnés via quêtes et hauts faits.
+Faites les quêtes de départ dans la taverne de Skjoldheim !
+Evitez de remplir votre journal de quêtes avec des quêtes qui ne correspondent pas à votre niveau de progression.
+Les quêtes répétables sont affichées en bleue dans votre journal de quête. 
+Les quêtes principales sont affichées en jaune dans votre journal de quête.
+Participer sur Discord vous rapporte des récompenses en jeu.
+Passer en visée libre avec votre Dragon avec la touche W et X
