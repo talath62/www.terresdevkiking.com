@@ -20,7 +20,7 @@ export default function Hero() {
     <section className="hero">
       <div className="hero-bg" style={{ backgroundImage: `url(${background})` }} />
       <div className="hero-shade" />
-      <img className="hero-crest" src="/terres-de-viking-logo.webp" alt="" aria-hidden="true" />
+      <img className="hero-crest" src="/terres-de-viking-logo.webp" alt="" aria-hidden="true" fetchpriority="high" />
       <div className="hero-runes" aria-hidden="true">ᚠ ᛟ ᚱ ᚷ ᛖ</div>
 
       <div className="container hero-layout">

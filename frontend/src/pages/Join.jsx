@@ -30,8 +30,7 @@ export default function Join() {
             <div style={{ background: 'var(--dark-3)', border: '1px solid var(--border)', borderRadius: 8, padding: 30 }}>
               <h3 style={{ color: 'var(--primary)', marginBottom: 15 }}>3. Connecte-toi !</h3>
               <p style={{ color: 'var(--text-muted)', lineHeight: 1.8 }}>
-                Une fois accepté, tu recevras l'adresse IP du serveur et le mot de passe.
-                Lance Valheim, connecte-toi et commence ton aventure parmi les Vikings !
+                Tu recevras tes accès pour commencer l'aventure.
               </p>
             </div>
           </div>

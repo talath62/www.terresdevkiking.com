@@ -1,4 +1,8 @@
 .intro-section { padding-bottom: 0; }
+.slider-header { display: flex; justify-content: center; margin-bottom: 14px; }
+.slider-top-link { display: inline-flex; align-items: center; gap: 10px; padding: 8px 18px; border: 1px solid rgba(216,181,106,.35); border-radius: 999px; background: rgba(216,181,106,.1); color: var(--primary-light); font-size: .82rem; font-weight: 700; letter-spacing: .04em; text-decoration: none; backdrop-filter: blur(8px); transition: background .2s, border .2s, transform .2s; }
+.slider-top-link:hover { border-color: var(--primary); background: rgba(216,181,106,.2); transform: translateY(-1px); }
+.slider-top-link span { font-size: .7rem; }
 .intro-grid { display: grid; grid-template-columns: 1.25fr .75fr; align-items: end; gap: 80px; margin-bottom: 70px; }
 .intro-copy { padding-bottom: 12px; }
 .intro-copy p { margin-bottom: 26px; color: var(--text-muted); font-size: 1.04rem; }

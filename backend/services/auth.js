@@ -16,9 +16,19 @@ function parseCookies(header = '') {
   }))
 }
 
-function cookieOptions(req, maxAge) {
+function cookieOptions(req, maxAge, sameSite = 'lax') {
   const secure = req.get('x-forwarded-proto') === 'https' || req.secure
-  return { httpOnly: true, secure, sameSite: 'lax', path: '/', maxAge }
+  const options = { httpOnly: true, secure, sameSite, path: '/', maxAge }
+  const publicUrl = process.env.PUBLIC_URL
+  if (publicUrl) {
+    try {
+      const hostname = new URL(publicUrl).hostname
+      if (hostname.includes('.') && !hostname.startsWith('localhost') && !/^\d/.test(hostname)) {
+        options.domain = '.' + hostname
+      }
+    } catch {}
+  }
+  return options
 }
 
 function createSession(req, res, userId) {
@@ -31,7 +41,11 @@ function createSession(req, res, userId) {
 function destroySession(req, res) {
   const token = parseCookies(req.get('cookie'))[SESSION_COOKIE]
   if (token) db.prepare('DELETE FROM sessions WHERE token_hash = ?').run(hash(token))
-  res.clearCookie(SESSION_COOKIE, cookieOptions(req, 0))
+  const opts = cookieOptions(req, 0)
+  res.clearCookie(SESSION_COOKIE, opts)
+  const plain = { ...opts }
+  delete plain.domain
+  res.clearCookie(SESSION_COOKIE, plain)
 }
 
 function getUser(req) {

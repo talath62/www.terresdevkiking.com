@@ -57,8 +57,20 @@ db.exec(`
     delivered_at TEXT
   );
 
+  CREATE TABLE IF NOT EXISTS pending_tickets (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    email TEXT NOT NULL,
+    player_name TEXT NOT NULL DEFAULT '',
+    amount INTEGER NOT NULL CHECK (amount > 0),
+    reason TEXT NOT NULL DEFAULT '',
+    claimed INTEGER NOT NULL DEFAULT 0,
+    created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    claimed_at TEXT
+  );
+
   CREATE INDEX IF NOT EXISTS idx_sessions_expires ON sessions(expires_at);
   CREATE INDEX IF NOT EXISTS idx_spins_user ON spins(user_id, created_at DESC);
+  CREATE INDEX IF NOT EXISTS idx_pending_tickets_email ON pending_tickets(email, claimed);
 `)
 
 module.exports = db

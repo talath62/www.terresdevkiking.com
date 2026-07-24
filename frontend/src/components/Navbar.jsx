@@ -51,7 +51,7 @@ export default function Navbar({ onOpenGifts, onOpenProfile }) {
           </ul>
           <div className="nav-actions">
             <Link to="/nous-rejoindre" className="nav-cta" onClick={() => setOpen(false)}>Nous rejoindre <span>↗</span></Link>
-            <button className="nav-gifts" type="button" onClick={() => { setOpen(false); onOpenGifts() }}>🎁 Cadeaux</button>
+            <button className="nav-gifts" type="button" onClick={() => { setOpen(false); onOpenGifts() }}>🎁</button>
             {authUser ? (
               <button className="nav-auth is-connected" type="button" onClick={() => { setOpen(false); onOpenProfile() }} title="Ouvrir mon profil">
                 {authUser.avatarUrl && <img src={authUser.avatarUrl} alt="" referrerPolicy="no-referrer" />}

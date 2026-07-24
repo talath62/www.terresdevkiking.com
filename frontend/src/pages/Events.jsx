@@ -161,6 +161,10 @@ export default function Events() {
             </article>
           ))}
         </div>
+        <div className="events-more">
+          <span className="events-more-rune" aria-hidden="true">ᚠ · ᛟ · ᚱ · ᛞ · ᛏ</span>
+          <p>Et bien d&rsquo;autres encore à découvrir&hellip;</p>
+        </div>
       </section>
     </div>
   )

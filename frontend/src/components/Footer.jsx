@@ -24,8 +24,13 @@ export default function Footer() {
       <div className="footer-rune" aria-hidden="true">ᚦ · ᛟ · ᚢ · ᚱ</div>
       <div className="container footer-grid">
         <div className="footer-brand">
-          <img className="footer-logo" src="/terres-de-viking-logo.webp" alt="Blason Terres de Viking" />
-          <span className="eyebrow">Une saga à vivre</span>
+          <div className="brand-badge">
+            <img className="footer-logo" src="/terres-de-viking-logo.webp" alt="Blason Terres de Viking" />
+            <div className="brand-badge-text">
+              <span>Terres de Viking</span>
+              <span>Serveur Valheim Francophone n°1</span>
+            </div>
+          </div>
           <h3>Chaque Viking<br />forge son histoire.</h3>
           <p>Un monde Valheim façonné à la main, porté par une communauté francophone passionnée.</p>
         </div>

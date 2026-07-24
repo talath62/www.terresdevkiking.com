@@ -57,6 +57,9 @@ export default function Home() {
             <Link to="/notre-communaute-viking-valheim" className="text-link">Découvrir notre communauté <span>→</span></Link>
           </div>
         </div>
+        <div className="container slider-header">
+          <a href="https://top-serveurs.net/valheim/terres-de-viking" target="_blank" rel="noreferrer" className="slider-top-link">Communauté Valheim FR n°1 sur Top-serveurs <span>↗</span></a>
+        </div>
         <div className="container"><WorldSlider /></div>
       </section>
 

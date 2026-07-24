@@ -181,6 +181,31 @@ router.get('/admin/spins', requireAdmin, (req, res) => {
   `).all() })
 })
 
+router.post('/admin/pending-tickets', (req, res) => {
+  const apiKey = process.env.VALHALLA_API_KEY || ''
+  const authHeader = req.get('authorization') || ''
+  if (!apiKey || authHeader !== `Bearer ${apiKey}`) return res.status(401).json({ message: 'Clé API invalide' })
+
+  const playerName = String(req.body.playerName || req.body.player_name || '').trim()
+  const amount = Number(req.body.amount)
+  const email = String(req.body.email || '').trim().toLowerCase()
+  const reason = String(req.body.reason || '').trim()
+
+  if (!playerName) return res.status(400).json({ message: 'Nom du joueur requis' })
+  if (!Number.isInteger(amount) || amount < 1 || amount > 10000) return res.status(400).json({ message: 'Quantité de tickets invalide (1-10000)' })
+
+  db.prepare('INSERT INTO pending_tickets (email, player_name, amount, reason) VALUES (?, ?, ?, ?)').run(email, playerName, amount, reason)
+
+  const normalized = playerName.toLowerCase()
+  const user = db.prepare('SELECT * FROM users WHERE LOWER(player_name) = ?').get(normalized)
+  if (user) {
+    db.prepare('UPDATE users SET tickets = tickets + ? WHERE id = ?').run(amount, user.id)
+    db.prepare('UPDATE pending_tickets SET claimed = 1, claimed_at = CURRENT_TIMESTAMP WHERE LOWER(player_name) = ? AND claimed = 0').run(normalized)
+  }
+
+  res.status(201).json({ message: 'Tickets ajoutés', playerName, amount, linked: Boolean(user) })
+})
+
 function validateReward(body) {
   const name = String(body.name || '').trim()
   const prefabName = String(body.prefabName || '').trim()

@@ -35,7 +35,7 @@ export default function WorldSlider() {
       <div className="slider-stage">
         {slides.map((slide, index) => (
           <figure className={`slider-slide ${index === current ? 'active' : ''}`} key={slide.image} aria-hidden={index !== current}>
-            <img src={slide.image} alt={slide.title} loading={index === 0 ? 'eager' : 'lazy'} />
+            <img src={slide.image} alt={slide.title} loading={index === 0 ? 'eager' : 'lazy'} fetchpriority={index === 0 ? 'high' : undefined} />
           </figure>
         ))}
         <div className="slider-overlay" />

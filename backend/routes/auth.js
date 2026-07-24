@@ -2,10 +2,21 @@ const crypto = require('crypto')
 const express = require('express')
 const path = require('path')
 const fs = require('fs')
+const multer = require('multer')
 const db = require('../services/database')
 const { STATE_COOKIE, cookieOptions, createSession, destroySession, getUser, hash, parseCookies, publicUser, requireUser } = require('../services/auth')
 
 const router = express.Router()
+
+const avatarUpload = multer({
+  dest: path.join(__dirname, '..', 'uploads', 'avatars'),
+  limits: { fileSize: 5 * 1024 * 1024 },
+  fileFilter: (_req, file, cb) => {
+    const allowed = ['.png', '.jpg', '.jpeg', '.webp', '.gif']
+    const ext = path.extname(file.originalname).toLowerCase()
+    cb(null, allowed.includes(ext))
+  },
+})
 const GOOGLE_AUTHORIZE_URL = 'https://accounts.google.com/o/oauth2/v2/auth'
 const GOOGLE_TOKEN_URL = 'https://oauth2.googleapis.com/token'
 const GOOGLE_USERINFO_URL = 'https://www.googleapis.com/oauth2/v2/userinfo'
@@ -28,10 +39,10 @@ router.get('/google', (req, res) => {
   if (!config.clientId || !config.clientSecret) return res.status(503).send('Connexion Google non configurée')
 
   const state = crypto.randomBytes(32).toString('base64url')
-  const expiresAt = new Date(Date.now() + 10 * 60000).toISOString()
+  const expiresAt = new Date(Date.now() + 30 * 60000).toISOString()
   db.prepare('DELETE FROM oauth_states WHERE expires_at <= ?').run(new Date().toISOString())
   db.prepare('INSERT INTO oauth_states (state_hash, expires_at) VALUES (?, ?)').run(hash(state), expiresAt)
-  res.cookie(STATE_COOKIE, state, cookieOptions(req, 10 * 60000))
+  res.cookie(STATE_COOKIE, state, cookieOptions(req, 30 * 60000, 'none'))
 
   const params = new URLSearchParams({
     client_id: config.clientId,
@@ -48,10 +59,17 @@ router.get('/google/callback', async (req, res) => {
   const state = String(req.query.state || '')
   const cookieState = parseCookies(req.get('cookie'))[STATE_COOKIE]
   const storedState = state && db.prepare('SELECT * FROM oauth_states WHERE state_hash = ? AND expires_at > ?').get(hash(state), new Date().toISOString())
-  if (!cookieState || !state || cookieState !== state || !storedState) return res.status(400).send('État OAuth invalide ou expiré')
+  if (!cookieState || !state || cookieState !== state || !storedState) {
+    console.error('OAuth échec:', { hasCookie: Boolean(cookieState), hasState: Boolean(state), match: cookieState === state, hasStored: Boolean(storedState), cookieLength: cookieState?.length, stateLength: state.length })
+    return res.status(400).send('État OAuth invalide ou expiré')
+  }
 
   db.prepare('DELETE FROM oauth_states WHERE state_hash = ?').run(hash(state))
-  res.clearCookie(STATE_COOKIE, cookieOptions(req, 0))
+  const stateOpts = cookieOptions(req, 0, 'none')
+  res.clearCookie(STATE_COOKIE, stateOpts)
+  const statePlain = { ...stateOpts }
+  delete statePlain.domain
+  res.clearCookie(STATE_COOKIE, statePlain)
 
   try {
     const config = oauthConfig(req)
@@ -80,13 +98,20 @@ router.get('/google/callback', async (req, res) => {
       ON CONFLICT(google_id) DO UPDATE SET
         email = excluded.email,
         name = excluded.name,
-        avatar_url = excluded.avatar_url,
         role = CASE WHEN excluded.role = 'admin' THEN 'admin' ELSE users.role END,
         last_seen_at = CURRENT_TIMESTAMP
     `).run(String(profile.id), profile.email || '', profile.name || '', profile.picture || '', role)
     const user = db.prepare('SELECT * FROM users WHERE google_id = ?').get(String(profile.id))
+
+    const pending = db.prepare('SELECT SUM(amount) AS total FROM pending_tickets WHERE email = ? AND claimed = 0').get(profile.email || '')
+    if (pending?.total) {
+      db.prepare('UPDATE users SET tickets = tickets + ? WHERE id = ?').run(pending.total, user.id)
+      db.prepare('UPDATE pending_tickets SET claimed = 1, claimed_at = CURRENT_TIMESTAMP WHERE email = ? AND claimed = 0').run(profile.email || '')
+    }
+
     createSession(req, res, user.id)
-    res.redirect('/?profile=setup')
+    const redirectUrl = user.player_name ? '/' : '/?profile=setup'
+    res.redirect(redirectUrl)
   } catch (error) {
     console.error('Google OAuth:', error)
     res.status(502).send('La connexion Google a échoué')
@@ -102,48 +127,34 @@ router.patch('/profile', requireUser, (req, res) => {
   const playerName = String(req.body.playerName || '').trim()
   if (playerName.length < 2 || playerName.length > 64) return res.status(400).json({ message: 'Le nom en jeu doit contenir entre 2 et 64 caractères' })
   db.prepare('UPDATE users SET player_name = ? WHERE id = ?').run(playerName, req.user.id)
+
+  const normalized = playerName.toLowerCase()
+  const pending = db.prepare('SELECT SUM(amount) AS total FROM pending_tickets WHERE LOWER(player_name) = ? AND claimed = 0').get(normalized)
+  if (pending?.total) {
+    db.prepare('UPDATE users SET tickets = tickets + ? WHERE id = ?').run(pending.total, req.user.id)
+    db.prepare('UPDATE pending_tickets SET claimed = 1, claimed_at = CURRENT_TIMESTAMP WHERE LOWER(player_name) = ? AND claimed = 0').run(normalized)
+  }
+
   res.json({ user: publicUser(db.prepare('SELECT * FROM users WHERE id = ?').get(req.user.id)) })
 })
 
-router.post('/avatar', requireUser, async (req, res) => {
-  try {
-    const buffers = []
-    for await (const chunk of req) buffers.push(chunk)
-    const body = Buffer.concat(buffers)
-    const boundary = req.headers['content-type']?.split('boundary=')[1]
-    if (!boundary) return res.status(400).json({ message: 'En-tête multipart invalide' })
-
-    const parts = []
-    const raw = body.toString('latin1')
-    const delimiter = `--${boundary}`
-    const sections = raw.split(delimiter).filter((s) => s.trim() && !s.startsWith('--' + boundary + '--'))
-
-    for (const section of sections) {
-      const headerEnd = section.indexOf('\r\n\r\n')
-      if (headerEnd === -1) continue
-      const headerRaw = section.slice(0, headerEnd)
-      const contentRaw = section.slice(headerEnd + 4)
-      const nameMatch = headerRaw.match(/name="([^"]+)"/)
-      const filenameMatch = headerRaw.match(/filename="([^"]+)"/)
-      if (nameMatch && filenameMatch) {
-        const filename = `${Date.now()}-${filenameMatch[1].replace(/[^a-zA-Z0-9._-]/g, '_')}`
-        const ext = path.extname(filename).toLowerCase()
-        if (!['.png', '.jpg', '.jpeg', '.webp', '.gif'].includes(ext)) return res.status(400).json({ message: 'Format d’image non supporté' })
-        const uploadDir = path.join(__dirname, '..', 'uploads', 'avatars')
-        fs.mkdirSync(uploadDir, { recursive: true })
-        const filePath = path.join(uploadDir, filename)
-        const rawContent = contentRaw.replace(/\r\n$/, '')
-        fs.writeFileSync(filePath, Buffer.from(rawContent, 'latin1'))
-        const avatarUrl = `/uploads/avatars/${filename}`
-        db.prepare('UPDATE users SET avatar_url = ? WHERE id = ?').run(avatarUrl, req.user.id)
-        return res.json({ user: publicUser(db.prepare('SELECT * FROM users WHERE id = ?').get(req.user.id)) })
-      }
+router.post('/avatar', requireUser, (req, res) => {
+  avatarUpload.single('avatar')(req, res, (err) => {
+    if (err) {
+      console.error('Avatar upload:', err)
+      return res.status(400).json({ message: err.message || 'Upload impossible' })
     }
-    return res.status(400).json({ message: 'Aucun fichier trouvé dans la requête' })
-  } catch (err) {
-    console.error('Avatar upload:', err)
-    res.status(500).json({ message: 'L\'upload a échoué' })
-  }
+    if (!req.file) return res.status(400).json({ message: 'Aucun fichier fourni' })
+    const ext = path.extname(req.file.originalname).toLowerCase()
+    const filename = `${Date.now()}-${req.file.originalname.replace(/[^a-zA-Z0-9._-]/g, '_')}`
+    const uploadDir = path.join(__dirname, '..', 'uploads', 'avatars')
+    fs.mkdirSync(uploadDir, { recursive: true })
+    const destPath = path.join(uploadDir, filename)
+    fs.renameSync(req.file.path, destPath)
+    const avatarUrl = `/uploads/avatars/${filename}`
+    db.prepare('UPDATE users SET avatar_url = ? WHERE id = ?').run(avatarUrl, req.user.id)
+    res.json({ user: publicUser(db.prepare('SELECT * FROM users WHERE id = ?').get(req.user.id)) })
+  })
 })
 
 router.post('/logout', (req, res) => {

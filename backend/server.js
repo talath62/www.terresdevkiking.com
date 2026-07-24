@@ -1,3 +1,5 @@
+require('dotenv').config()
+
 const express = require('express')
 const path = require('path')
 const apiRoutes = require('./routes/api')
@@ -17,6 +19,11 @@ app.use('/api/valhalla', valhallaRoutes)
 
 app.get('/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() })
+})
+
+app.use((err, _req, res, _next) => {
+  console.error('Unhandled error:', err)
+  res.status(500).json({ message: 'Erreur interne du serveur' })
 })
 
 app.listen(PORT, () => {
